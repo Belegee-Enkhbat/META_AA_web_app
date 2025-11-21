@@ -1,274 +1,431 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import ChatHeader from "./ChatHeader";
-import ChatMessageBlock from "./ChatMessage";
-import QuickActions from "./QuickActions";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bot, User, Sparkles, BarChart3, Search } from "lucide-react"; // Added missing icons for completeness
+
+// Import your existing blocks
 import AccountSelector from "./AccountSelector";
 import ScoreBlock from "./ScoreBlock";
 import RecommendationBlock from "./RecommendationBlock";
 import AdSearchBlock from "./AdSearchBlock";
 import TrendReportBlock from "./TrendReportBlock";
 import ComparisonBlock from "./ComparisonBlock";
-import MetaAAAgentBlock, { metaAAAgentSteps } from "./MetaAAAgentBlock";
-import { ChatMessage } from "@/types/chat";
+import MetaAAAgentBlock from "./MetaAAAgentBlock";
+import QuickActions from "./QuickActions";
+
+// Mock data imports
 import { accounts, recommendations, adCards, trendReport, comparisonResult } from "@/service/staticData";
 
+// --- Types ---
 type FlowType = "media" | "variation" | "meta";
+type ChatMessage = {
+  type: "bot" | "user";
+  content: React.ReactNode;
+};
 
+// --- Animation Variants ---
+const fadeInUp = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
+// Placeholder for ComparisonBlock (assuming it's a separate file, but defined here for context)
+
+// --- MAIN COMPONENT ---
 export default function ChatWindow() {
-  const [history, setHistory] = useState<ChatMessage[]>([]);
+  const [history, setHistory] = useState<ChatMessage[]>([
+    {
+      type: "bot",
+      content: (
+        <div className="space-y-2">
+          <p className="text-lg font-semibold text-gray-800">こんにちは、山本さん！👋</p>
+          <p className="text-gray-600">
+            私は <span className="font-bold text-blue-600">Marketing AI Superagent</span> です。
+            <br />あなたのマーケティング活動を全面的にサポートします。
+          </p>
+          <p className="text-sm text-gray-500 mt-2">今日はどのようなサポートが必要ですか？</p>
+        </div>
+      ),
+    },
+  ]);
+
   const [flow, setFlow] = useState<FlowType | null>(null);
   const [step, setStep] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Media flow state
+  // --- Media Flow State ---
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [score] = useState<number>(59);
   const [recIdx, setRecIdx] = useState(0);
-  const [showDetail, setShowDetail] = useState(false);
-  const [applied, setApplied] = useState<string[]>([]);
-  const [rejected, setRejected] = useState<string[]>([]);
+  const [showRecDetail, setShowRecDetail] = useState(false);
 
-  // Variation flow state
+  // --- Variation Flow State ---
   const [adSelected, setAdSelected] = useState<string[]>([]);
   const [showTrend, setShowTrend] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
 
-  // Meta AA flow state
-  const [metaStep, setMetaStep] = useState(0);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Initial greeting (only once)
-  useEffect(() => {
-    setHistory([
-      {
-        type: "bot",
-        content: (
-          <>
-            <strong>こんにちは、山本さん！</strong>
-            <br />
-            私はMarketing AI Superagentです。あなたのマーケティング活動を全面的にサポートします。
-            <br />
-            <span style={{ marginTop: 15 }}>今日はどのようなサポートが必要ですか？</span>
-          </>
-        ),
-      },
-    ]);
-  }, []);
-
+  // Scroll to bottom on state changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [history.length, isTyping, step, flow]);
+
+  // Helper to add messages with a slight natural delay
+  const addBotMessage = (content: React.ReactNode, delay = 600) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setHistory((prev) => [...prev, { type: "bot", content }]);
+    }, delay);
+  };
+
+  const addUserMessage = (content: React.ReactNode) => {
+    setHistory((prev) => [...prev, { type: "user", content }]);
+  };
+  
+  // New unified history update handler
+  const handleHistoryUpdate = useCallback((userContent: string, botContent: string | React.ReactNode, delay = 600, callback?: () => void) => {
+    // 1. Add User message immediately
+    addUserMessage(userContent);
+    
+    // 2. Add Bot message after typing delay
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setHistory((prev) => [...prev, { type: "bot", content: botContent }]);
+      if (callback) {
+        // Run the step change/state update after the message is fully logged
+        callback(); 
+      }
+    }, delay);
   }, []);
 
-  // Handler for main quick actions
+  // --- Flow & Step Handlers ---
+
   const handleQuickAction = (key: FlowType) => {
     setFlow(key);
     setStep(0);
-    setMetaStep(0);
+    
+    // Reset Sub-states
     setShowTrend(false);
     setShowComparison(false);
     setSelectedAccount("");
     setRecIdx(0);
-    setApplied([]);
-    setRejected([]);
     setAdSelected([]);
-    setShowDetail(false);
-    setAdSelected([]);
-    setShowDetail(false);
+    setShowRecDetail(false);
 
-    setHistory((h) => [
-      ...h,
-      {
-        type: "user",
-        content:
-          key === "media"
-            ? "📊 Media Operation Support AI × Optimization Score"
-            : key === "variation"
-            ? "💡 Variation Proposal"
-            : "📈 Meta AA Agent",
-      },
-    ]);
+    // Handle Meta Flow (Delegated to component)
+    if (key === "meta") return; 
 
-    // Add first bot message for each flow
+    // Handle Standard Flows
+    const labels = {
+      media: "📊 Media Operation Support AI × Optimization Score",
+      variation: "💡 Variation Proposal",
+    };
+
+    addUserMessage(labels[key]);
+
     if (key === "media") {
-      setTimeout(() => {
-        setHistory((h) => [
-          ...h,
-          { type: "bot", content: "かしこまりました。広告アカウントIDを選択してください。" },
-        ]);
-      }, 300);
+      addBotMessage("かしこまりました。分析対象の広告アカウントIDを選択してください。");
     } else if (key === "variation") {
-      setTimeout(() => {
-        setHistory((h) => [
-          ...h,
-          { type: "bot", content: "広告のトレンド分析をしたいです" },
-        ]);
-        setTimeout(() => {
-          setHistory((h) => [
-            ...h,
-            { type: "bot", content: "かしこまりました。Ad Creative Library APIを使用してトレンド分析を行います。" },
-          ]);
-          setStep(1);
-        }, 600);
-      }, 300);
-    } else if (key === "meta") {
-      setTimeout(() => {
-        setHistory((h) => [
-          ...h,
-          { type: "bot" as ChatMessage["type"], content: metaAAAgentSteps[0].bot },
-          ...(metaAAAgentSteps[0].user
-            ? [{ type: "user" as ChatMessage["type"], content: metaAAAgentSteps[0].user }]
-            : []),
-        ]);
-      }, 300);
+      addBotMessage("広告のトレンド分析を開始します。Ad Creative Library APIに接続しています...");
+      setTimeout(() => setStep(1), 1000); // Only sets step, no UI required yet
     }
   };
 
-  // Media flow: handle account selection
+  // Media Flow Logic
   const handleAccountConfirm = () => {
-    setHistory((h) => [
-      ...h,
-      { type: "user", content: `アカウント ${selectedAccount} を選択しました` },
-      { type: "bot", content: "データを取得中..." },
-    ]);
+    addUserMessage(`アカウント ${selectedAccount} を選択しました`);
+    setIsTyping(true);
+    
+    // Simulate API Call
     setTimeout(() => {
-      setHistory((h) => [
-        ...h,
-        { type: "bot", content: <ScoreBlock score={score} accountId={selectedAccount} /> },
-      ]);
+      setIsTyping(false);
+      setHistory((h) => [...h, { type: "bot", content: <ScoreBlock score={score} accountId={selectedAccount} /> }]);
+      
       setTimeout(() => {
-        setHistory((h) => [
-          ...h,
-          { type: "bot", content: "📋 推奨事項を一つずつ確認していきます：" },
-        ]);
+        addBotMessage("📋 現状のスコアに基づき、推奨事項を一つずつ確認していきましょう。");
         setStep(2);
       }, 800);
-    }, 800);
+    }, 1000);
   };
 
-  // Meta AA Agent: handle next step
-  const handleMetaNext = () => {
-    const nextStep = metaStep + 1;
-    if (nextStep < metaAAAgentSteps.length) {
-      setHistory((h) => [
-        ...h,
-        { type: "bot" as ChatMessage["type"], content: metaAAAgentSteps[nextStep].bot },
-        ...(metaAAAgentSteps[nextStep].user
-          ? [{ type: "user" as ChatMessage["type"], content: metaAAAgentSteps[nextStep].user }]
-          : []),
-      ]);
-      setMetaStep(nextStep);
-    }
+  const handleRecApply = () => {
+    addUserMessage("✅ 適用する");
+    handleRecNext("apply");
   };
 
-  return (
-    <div className="w-full max-w-4xl  mx-auto mt-8 bg-zinc-50 rounded-b-2xl pb-8">
-      <ChatHeader />
-      <div className="px-4 py-6">
-        {history.map((msg, i) => (
-          <ChatMessageBlock key={i} message={msg} />
-        ))}
-        {!flow && <QuickActions onSelect={handleQuickAction} />}
-        {/* Media Flow */}
-        {flow === "media" && step === 0 && (
-          <AccountSelector
-            accounts={accounts}
-            value={selectedAccount}
-            onChange={setSelectedAccount}
-            onConfirm={handleAccountConfirm}
-          />
-        )}
-        {flow === "media" && step === 2 && (
-          <RecommendationBlock
-            rec={recommendations[recIdx]}
-            expanded={showDetail}
-            onExpand={() => setShowDetail(true)}
-            onCollapse={() => setShowDetail(false)}
-            onApply={() => {
-              setApplied((a) => [...a, recommendations[recIdx].id]);
-              setHistory((h) => [...h, { type: "user", content: "適用" }]);
-              if (recIdx < recommendations.length - 1) {
-                setRecIdx(recIdx + 1);
-                setShowDetail(false);
-              } else {
-                setStep(3);
-                setHistory((h) => [
-                  ...h,
-                  {
-                    type: "bot",
-                    content:
-                      "✅ 推奨事項を適用しました。以下の効果が期待されます：\nROI: +15%向上\nリーチ: +12%拡大\nCPA: -8%削減\n変更は5-10分で反映されます。",
-                  },
-                ]);
-              }
-            }}
-            onReject={() => {
-              setRejected((r) => [...r, recommendations[recIdx].id]);
-              setHistory((h) => [...h, { type: "user", content: "却下" }]);
-              if (recIdx < recommendations.length - 1) {
-                setRecIdx(recIdx + 1);
-                setShowDetail(false);
-              } else {
-                setStep(3);
-                setHistory((h) => [
-                  ...h,
-                  {
-                    type: "bot",
-                    content:
-                      "✅ 推奨事項を適用しました。以下の効果が期待されます：\nROI: +15%向上\nリーチ: +12%拡大\nCPA: -8%削減\n変更は5-10分で反映されます。",
-                  },
-                ]);
-              }
-            }}
-          />
-        )}
-        {/* Variation Flow */}
-        {flow === "variation" && step === 1 && (
-          <AdSearchBlock
-            ads={adCards}
-            selected={adSelected}
-            onSelect={(id) =>
-              setAdSelected((sel) =>
-                sel.includes(id) ? sel.filter((s) => s !== id) : [...sel, id]
-              )
-            }
-            onConfirm={() => {
-              setShowTrend(true);
-              setStep(2);
-            }}
-          />
-        )}
-        {flow === "variation" && showTrend && (
-          <TrendReportBlock
-            report={trendReport}
-            onCompare={() => {
-              setShowComparison(true);
-              setStep(3);
-            }}
-            onSkip={() => setStep(4)}
-          />
-        )}
-        {flow === "variation" && showComparison && (
-          <ComparisonBlock result={comparisonResult} onNext={() => setStep(4)} />
-        )}
-        {flow === "variation" && step === 4 && (
-          <div className="bg-green-50 border-l-4 border-green-400 rounded-lg p-4 my-2">
-            <h4 className="font-bold mb-2">🎯 具体的改善提案</h4>
-            <ul>
-              <li>1. 縦型動画フォーマットへの変更</li>
-              <li>2. ライフスタイル要素の追加</li>
-              <li>3. ユーザー証言の組み込み</li>
+  const handleRecReject = () => {
+    addUserMessage("❌ 今回は見送る");
+    handleRecNext("reject");
+  };
+
+  const handleRecNext = (action: "apply" | "reject") => {
+    // Logic for tracking applied/rejected items would go here
+    
+    if (recIdx < recommendations.length - 1) {
+      setRecIdx((prev) => prev + 1);
+      setShowRecDetail(false);
+    } else {
+      setStep(3);
+      addBotMessage(
+        <div className="space-y-2">
+          <p className="font-bold text-green-600">✅ すべての推奨事項を処理しました。</p>
+          <div className="bg-green-50 p-3 rounded-lg text-sm text-green-800">
+            <p>予想される改善効果:</p>
+            <ul className="list-disc pl-4 mt-1">
+              <li>ROI: +15% 向上</li>
+              <li>リーチ: +12% 拡大</li>
+              <li>CPA: -8% 削減</li>
             </ul>
           </div>
+          <p className="text-xs text-gray-500">変更は5-10分以内に広告マネージャに反映されます。</p>
+        </div>
+      );
+    }
+  };
+  
+  // --- Variation Flow Handlers (FIXED) ---
+
+  const handleAdConfirm = () => {
+    handleHistoryUpdate(
+        `選択した広告 (${adSelected.length} 件) のトレンド分析を開始します。`,
+        `承知しました。選択された広告クリエイティブに基づき、トレンド分析レポートを作成しました。`,
+        1200,
+        () => {
+            setShowTrend(true);
+            setStep(2);
+        }
+    );
+  };
+
+  const handleCompare = () => {
+    handleHistoryUpdate(
+        `比較分析を開始する`,
+        `比較分析を実行しました。結果をご確認ください。`,
+        1000,
+        () => {
+            setShowComparison(true);
+            setStep(3);
+        }
+    );
+  };
+
+  const handleSkip = () => {
+    handleHistoryUpdate(
+        `改善提案へスキップする`,
+        `承知しました。トレンド分析レポートの内容から直接、具体的な改善提案を提示します。`,
+        1000,
+        () => {
+            setStep(4);
+        }
+    );
+  };
+  
+  const handleComparisonNext = () => {
+    handleHistoryUpdate(
+        `分析結果に基づき、具体的な提案に進む`,
+        `比較分析の結果を考慮し、最適なクリエイティブ改善提案を生成しました。`,
+        1000,
+        () => {
+            setStep(4);
+        }
+    );
+  };
+
+  // --- Render Helpers ---
+
+  const renderMessage = (msg: ChatMessage, index: number) => (
+    <motion.div
+      key={index}
+      initial="hidden"
+      animate="visible"
+      variants={fadeInUp}
+      className={`flex gap-3 mb-6 ${msg.type === "user" ? "flex-row-reverse" : "flex-row"}`}
+    >
+      {/* Avatar */}
+      <div
+        className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md shrink-0 ${
+          msg.type === "bot" ? "bg-gradient-to-br from-blue-600 to-indigo-600" : "bg-gray-200"
+        }`}
+      >
+        {msg.type === "bot" ? <Bot size={20} className="text-white" /> : <User size={20} className="text-gray-600" />}
+      </div>
+
+      {/* Bubble */}
+      <div
+        className={`relative max-w-[80%] px-5 py-4 text-sm leading-relaxed shadow-sm ${
+          msg.type === "bot"
+            ? "bg-white text-gray-800 rounded-2xl rounded-tl-none border border-gray-100"
+            : "bg-blue-600 text-white rounded-2xl rounded-tr-none"
+        }`}
+      >
+        {msg.content}
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <div className="flex flex-col w-full max-w-5xl mx-auto mt-4 h-[85vh] bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+      
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 p-4 sticky top-0 z-10 flex items-center gap-3">
+        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+          <Sparkles size={20} />
+        </div>
+        <div>
+          <h1 className="font-bold text-gray-800 text-lg">Marketing AI Superagent</h1>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="text-xs text-gray-500">Online • Powered by Meta AA</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Chat Content Area */}
+      <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50 scroll-smooth">
+        
+        {/* 1. Standard History (Media & Variation) */}
+        {flow !== "meta" && (
+          <AnimatePresence>
+            {history.map((msg, i) => renderMessage(msg, i))}
+          </AnimatePresence>
         )}
-        {/* Meta AA Agent Flow */}
+
+        {/* 2. Typing Indicator */}
+        {isTyping && flow !== "meta" && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 mb-6">
+             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shrink-0">
+                <Bot size={20} className="text-white" />
+            </div>
+            <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm flex items-center gap-1">
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></span>
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* 3. Quick Actions (Initial State) */}
+        {!flow && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.5 }}
+            className="mt-4"
+          >
+            <QuickActions onSelect={handleQuickAction} />
+          </motion.div>
+        )}
+
+        {/* 4. Media Flow Interactive Components */}
+        {flow === "media" && (
+          <div className="pl-12 animate-fade-in">
+            {step === 0 && (
+              <div className="max-w-md">
+                <AccountSelector
+                  accounts={accounts}
+                  value={selectedAccount}
+                  onChange={setSelectedAccount}
+                  onConfirm={handleAccountConfirm}
+                />
+              </div>
+            )}
+            
+            {step === 2 && recommendations[recIdx] && (
+              <div className="max-w-xl mt-4">
+                <RecommendationBlock
+                  rec={recommendations[recIdx]}
+                  expanded={showRecDetail}
+                  onExpand={() => setShowRecDetail(true)}
+                  onCollapse={() => setShowRecDetail(false)}
+                  onApply={handleRecApply}
+                  onReject={handleRecReject}
+                />
+                <div className="text-center mt-2 text-xs text-gray-400">
+                   推奨事項 {recIdx + 1} / {recommendations.length}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 5. Variation Flow Interactive Components (FIXED LOGIC) */}
+        {flow === "variation" && (
+          <div className="pl-12 animate-fade-in">
+             {/* Step 1: Ad Search */}
+             {step === 1 && (
+              <div className="max-w-2xl">
+                <AdSearchBlock
+                  ads={adCards}
+                  selected={adSelected}
+                  onSelect={(id) =>
+                    setAdSelected((sel) =>
+                      sel.includes(id) ? sel.filter((s) => s !== id) : [...sel, id]
+                    )
+                  }
+                  onConfirm={handleAdConfirm} // FIXED: Use handler that updates history
+                />
+              </div>
+            )}
+            
+            {/* Step 2: Trend Report */}
+            {step === 2 && showTrend && (
+              <div className="max-w-3xl mt-4">
+                <TrendReportBlock
+                  report={trendReport}
+                  onCompare={handleCompare} // FIXED: Use handler that updates history
+                  onSkip={handleSkip} // FIXED: Use handler that updates history
+                />
+              </div>
+            )}
+
+            {/* Step 3: Comparison Result */}
+            {step === 3 && showComparison && (
+              <div className="max-w-3xl mt-4">
+                <ComparisonBlock 
+                    result={comparisonResult} 
+                    onNext={handleComparisonNext} // FIXED: Use handler that updates history
+                />
+              </div>
+            )}
+
+            {/* Step 4: Final Recommendation */}
+            {step === 4 && (
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-white border border-green-200 rounded-xl p-6 my-4 shadow-sm max-w-xl"
+              >
+                <h4 className="font-bold text-green-800 flex items-center gap-2 mb-3">
+                  <Sparkles size={18} /> 具体的改善提案
+                </h4>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">1</span>
+                    縦型動画フォーマットへの変更 (Reels最適化)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">2</span>
+                    ライフスタイル要素の追加（商品単体ではなく使用シーン）
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">3</span>
+                    UGC（ユーザー証言）の冒頭3秒への組み込み
+                  </li>
+                </ul>
+              </motion.div>
+            )}
+          </div>
+        )}
+
+        {/* 6. Meta Agent Flow (Self-Contained) */}
         {flow === "meta" && (
-          <MetaAAAgentBlock
-            step={metaStep}
-            onNext={handleMetaNext}
-            isLast={metaStep === metaAAAgentSteps.length - 1}
-          />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            <MetaAAAgentBlock />
+          </motion.div>
         )}
+
         <div ref={messagesEndRef} />
       </div>
     </div>

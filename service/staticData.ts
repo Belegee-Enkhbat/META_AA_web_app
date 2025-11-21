@@ -3,7 +3,6 @@ import { Account, Recommendation, AdCard, TrendReport, ComparisonResult } from "
 export const accounts: Account[] = [
   { id: "379122459531219", name: "Main Account" },
   { id: "123456789012345", name: "Test Account" },
-  { id: "999999999999999", name: "No History" },
 ];
 
 export const recommendations: Recommendation[] = [
