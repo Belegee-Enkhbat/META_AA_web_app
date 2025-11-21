@@ -102,34 +102,36 @@ export default function ChatWindow() {
 
   // --- Flow & Step Handlers ---
 
-  const handleQuickAction = (key: FlowType) => {
-    setFlow(key);
-    setStep(0);
-    
-    // Reset Sub-states
-    setShowTrend(false);
-    setShowComparison(false);
-    setSelectedAccount("");
-    setRecIdx(0);
-    setAdSelected([]);
-    setShowRecDetail(false);
+  const handleQuickAction = (key: string) => {
+    if (key === "media" || key === "variation" || key === "meta") {
+      setFlow(key as FlowType);
+      setStep(0);
+      
+      // Reset Sub-states
+      setShowTrend(false);
+      setShowComparison(false);
+      setSelectedAccount("");
+      setRecIdx(0);
+      setAdSelected([]);
+      setShowRecDetail(false);
 
-    // Handle Meta Flow (Delegated to component)
-    if (key === "meta") return; 
+      // Handle Meta Flow (Delegated to component)
+      if (key === "meta") return; 
 
-    // Handle Standard Flows
-    const labels = {
-      media: "📊 Media Operation Support AI × Optimization Score",
-      variation: "💡 Variation Proposal",
-    };
+      // Handle Standard Flows
+      const labels = {
+        media: "📊 Media Operation Support AI × Optimization Score",
+        variation: "💡 Variation Proposal",
+      };
 
-    addUserMessage(labels[key]);
+      addUserMessage(labels[key as "media" | "variation"]);
 
-    if (key === "media") {
-      addBotMessage("かしこまりました。分析対象の広告アカウントIDを選択してください。");
-    } else if (key === "variation") {
-      addBotMessage("広告のトレンド分析を開始します。Ad Creative Library APIに接続しています...");
-      setTimeout(() => setStep(1), 1000); // Only sets step, no UI required yet
+      if (key === "media") {
+        addBotMessage("かしこまりました。分析対象の広告アカウントIDを選択してください。");
+      } else if (key === "variation") {
+        addBotMessage("広告のトレンド分析を開始します。Ad Creative Library APIに接続しています...");
+        setTimeout(() => setStep(1), 1000); // Only sets step, no UI required yet
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useAnimation, easeInOut } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
 export default function LoadingBlock({ message }: { message: string }) {
@@ -8,7 +8,7 @@ export default function LoadingBlock({ message }: { message: string }) {
     duration: 0.4,
     repeat: Infinity,
     repeatType: "reverse" as const,
-    ease: ["easeInOut"] as const,
+    ease: easeInOut,
   };
 
   return (
