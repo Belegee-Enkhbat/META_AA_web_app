@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, User, Sparkles, BarChart3, Search } from "lucide-react"; // Added missing icons for completeness
+import { Bot, User, Sparkles } from "lucide-react"; // Added missing icons for completeness
 
 // Import your existing blocks
 import AccountSelector from "./AccountSelector";
@@ -163,6 +163,7 @@ export default function ChatWindow() {
   };
 
   const handleRecNext = (action: "apply" | "reject") => {
+    console.log(`Recommendation ${recIdx + 1} was ${action}ed.`);
     // Logic for tracking applied/rejected items would go here
     
     if (recIdx < recommendations.length - 1) {

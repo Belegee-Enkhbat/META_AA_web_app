@@ -73,7 +73,7 @@ export const steps: Step[] = [
     type: "user",
     content: (
       <span>
-        They want to know how much digital advertising contributes to offline sales in Shiseido's campaign. TrueLift Analysis, please.
+        They want to know how much digital advertising contributes to offline sales in Shiseido`s campaign. TrueLift Analysis, please.
       </span>
     ),
     autoNext: true,
@@ -83,7 +83,7 @@ export const steps: Step[] = [
     type: "bot",
     content: (
       <div className="flex items-center gap-2">
-        <span className="animate-spin">⏳</span>
+        {/* <span className="animate-spin">⏳</span> */}
         Requirements Definition Agent Analyzing...
       </div>
     ),

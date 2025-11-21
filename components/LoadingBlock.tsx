@@ -1,4 +1,4 @@
-import { motion, useAnimation, easeInOut } from "framer-motion";
+import { motion, easeInOut } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
 export default function LoadingBlock({ message }: { message: string }) {
