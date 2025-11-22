@@ -57,14 +57,19 @@ export const recommendations: Recommendation[] = [
 ];
 
 export const adCards: AdCard[] = [
+  { id: "5", title: "Winter Skin Balm", brand: "DermPro", engagement: "2.1K", type: "image", date: "2025-11-21", dateDisplay: "2025年11月21日" },
+  { id: "6", title: "Summer Sunscreen", brand: "SunGuard", engagement: "9.5K", type: "video", date: "2025-07-01", dateDisplay: "2025年07月01日" },
+  { id: "7", title: "Holiday Gift Set", brand: "Beauty Brand A", engagement: "25.0K", type: "carousel", date: "2025-11-19", dateDisplay: "2025年11月19日" },
+  { id: "8", title: "Daily Moisturizer", brand: "Organic Beauty", engagement: "3.2K", type: "image", date: "2025-11-18", dateDisplay: "2025年11月18日" },
+  { id: "9", title: "A New Product Line", brand: "Startup Co.", engagement: "1.0K", type: "video", date: "2025-02-05", dateDisplay: "2025年02月05日" },
   {
     id: "1",
     title: "Luxury Lipstick Collection",
     brand: "Beauty Brand A",
     engagement: "12.5K",
     type: "video",
-    date: "2024-11-15",
-    dateDisplay: "2024年11月15日"
+    date: "2025-11-20", // Recent for demo
+    dateDisplay: "2025年11月20日"
   },
   {
     id: "2",
@@ -72,8 +77,8 @@ export const adCards: AdCard[] = [
     brand: "Cosmetics Co.",
     engagement: "8.9K",
     type: "image",
-    date: "2024-11-12",
-    dateDisplay: "2024年11月12日"
+    date: "2025-11-15", // Older for demo
+    dateDisplay: "2025年11月15日"
   },
   {
     id: "3",
@@ -81,8 +86,8 @@ export const adCards: AdCard[] = [
     brand: "Makeup Pro",
     engagement: "15.2K",
     type: "carousel",
-    date: "2024-11-14",
-    dateDisplay: "2024年11月14日"
+    date: "2025-10-01", // Last 30 days filter
+    dateDisplay: "2025年10月01日"
   },
   {
     id: "4",
@@ -90,8 +95,8 @@ export const adCards: AdCard[] = [
     brand: "Organic Beauty",
     engagement: "6.7K",
     type: "video",
-    date: "2024-11-10",
-    dateDisplay: "2024年11月10日"
+    date: "2025-01-10", // This Year filter
+    dateDisplay: "2025年01月10日"
   },
 ];
 

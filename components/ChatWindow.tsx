@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, User, Sparkles } from "lucide-react"; // Added missing icons for completeness
-
+import { AdCard } from "@/types/chat";
 // Import your existing blocks
 import AccountSelector from "./AccountSelector";
 import ScoreBlock from "./ScoreBlock";
@@ -187,6 +187,11 @@ export default function ChatWindow() {
       );
     }
   };
+  const processedAdCards: AdCard[] = adCards.map(card => ({
+      ...card,
+      timestamp: new Date(card.date).getTime(),
+  }));
+
   
   // --- Variation Flow Handlers (FIXED) ---
 
@@ -360,7 +365,7 @@ export default function ChatWindow() {
              {step === 1 && (
               <div className="max-w-2xl">
                 <AdSearchBlock
-                  ads={adCards}
+                  ads={processedAdCards}
                   selected={adSelected}
                   onSelect={(id) =>
                     setAdSelected((sel) =>

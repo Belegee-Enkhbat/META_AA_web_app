@@ -29,6 +29,7 @@ export type AdCard = {
   type: string;
   date: string;
   dateDisplay: string;
+  timestamp?: number;
 };
 
 export type TrendReport = {
