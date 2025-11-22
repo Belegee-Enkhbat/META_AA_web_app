@@ -11,7 +11,12 @@ export type Account = {
   id: string;
   name: string;
 };
-
+export interface MetaReportData {
+  summary: string;
+  liftPercentage: number;
+  incrementalSales: string; // Formatted currency
+  cpa: string; // Formatted currency
+}
 export type Recommendation = {
   id: string;
   title: string;
@@ -27,6 +32,8 @@ export type AdCard = {
   brand: string;
   engagement: string;
   type: string;
+  platform?: string;
+  impressions?: number;
   date: string;
   dateDisplay: string;
   timestamp?: number;

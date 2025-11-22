@@ -54,25 +54,28 @@ export default function AdSearchBlock({ ads, selected, onSelect, onConfirm }: Pr
   const currentPage = pageData.page;
   const [dateFilter, setDateFilter] = useState("all");
 
-  const getFilterTimestamp = (filter: string) => {
-    const now = Date.now();
+  const [now] = useState<number>(() => Date.now());
+  const getFilterTimestamp = useCallback((filter: string) => {
     switch (filter) {
       case "last-7-days": return now - 7 * 24 * 60 * 60 * 1000;
       case "last-30-days": return now - 30 * 24 * 60 * 60 * 1000;
       case "this-year": return new Date(new Date().getFullYear(), 0, 1).getTime();
       default: return 0;
     }
-  };
+  }, [now]);
 
   const filteredAds = useMemo(() => {
     const minTimestamp = getFilterTimestamp(dateFilter);
     return ads
       .filter((ad) => (ad.timestamp ?? 0) >= minTimestamp)
       .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0));
-  }, [ads, dateFilter]);
+  }, [ads, dateFilter, getFilterTimestamp]);
 
   useEffect(() => {
-    setPageData({ page: 0, direction: 0 });
+    if (pageData.page !== 0) {
+      setPageData({ page: 0, direction: 0 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateFilter, filteredAds.length]);
 
   const totalPages = Math.ceil(filteredAds.length / CARDS_PER_PAGE);

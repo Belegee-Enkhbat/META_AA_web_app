@@ -1,4 +1,4 @@
-import { Account, Recommendation, AdCard, TrendReport, ComparisonResult } from "@/types/chat";
+import { Account, Recommendation, AdCard, TrendReport, ComparisonResult, MetaReportData } from "@/types/chat";
 
 export const accounts: Account[] = [
   { id: "379122459531219", name: "Main Account" },
@@ -139,4 +139,12 @@ export const comparisonResult: ComparisonResult = {
     "感情訴求型のメッセージに変更 → コンバージョン率 +28%",
     "Instagram ReelsとStoriesを優先配信 → リーチ +60%, エンゲージメント +80%"
   ]
+};
+
+
+export const metaReport: MetaReportData = {
+  summary: "Incremental Lift: Users exposed to Meta ads had a significantly higher purchase rate.",
+  liftPercentage: 18.5,
+  incrementalSales: "¥156,890,000",
+  cpa: "¥12,450",
 };
