@@ -6,7 +6,7 @@ import ScoreBlock from "./ScoreBlock";
 export type RecProcessedType = "applied" | "rejected" | null;
 
 export type DetailDataType = {
-  flow: "media" | "meta" | null; // Track which flow populated the panel
+  flow: "meta" | "variation" | "media" | null; // Track which flow populated the panel
   score?: number;
   accountId?: string;
   recProcessed?: RecProcessedType;

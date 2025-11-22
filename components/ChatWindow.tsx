@@ -1,8 +1,8 @@
 "use client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, User, Sparkles, ChevronRight } from "lucide-react";
-import { AdCard, Recommendation, MetaReportData } from "@/types/chat"; 
+import { Bot, User, Sparkles } from "lucide-react";
+import { AdCard } from "@/types/chat"; 
 import AccountSelector from "./AccountSelector";
 import ScoreBlock from "./ScoreBlock";
 import RecommendationsBlock from "@/components/RecommendationBlock";
@@ -13,7 +13,7 @@ import MetaAAAgentBlock from "./MetaAAAgentBlock";
 import QuickActions from "./QuickActions";
 import { accounts, recommendations, adCards, trendReport, comparisonResult, metaReport } from "@/service/staticData";
 
-type FlowType = "media" | "variation" | "meta";
+export type FlowType = "media" | "variation" | "meta";
 type ChatMessage = {
   type: "bot" | "user";
   content: React.ReactNode;
@@ -21,11 +21,10 @@ type ChatMessage = {
 type RecProcessedType = "applied" | "rejected" | null;
 
 interface ChatWindowProps {
-  onShowDetail: (score: number, accountId: string, recProcessed: "applied" | "rejected") => void;
-  onShowMetaDetail: (data: MetaReportData) => void;
+  onShowPreview: (data: unknown) => void; // Use your DetailDataType if available
   onChatReset: () => void;
   isDetailOpen: boolean;
-  onFlowChange?: (flow: FlowType | null) => void; // <-- Add this prop
+  onFlowChange?: (flow: FlowType | null) => void;
 }
 
 const initialHistory: ChatMessage[] = [
@@ -50,11 +49,10 @@ const fadeInUp = {
 };
 
 export default function ChatWindow({
-  onShowDetail,
-  onShowMetaDetail,
+  onShowPreview,
   onChatReset,
   isDetailOpen,
-  onFlowChange, // <-- Add here
+  onFlowChange,
 }: ChatWindowProps) {
   const [history, setHistory] = useState<ChatMessage[]>(initialHistory);
   const [flow, setFlow] = useState<FlowType | null>(null);
@@ -74,11 +72,9 @@ export default function ChatWindow({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history.length, isTyping, step, flow]);
 
-  // --- FLOW CHANGE LOGGING ---
   useEffect(() => {
     if (onFlowChange) onFlowChange(flow);
   }, [flow, onFlowChange]);
-  // ---------------------------
 
   const addBotMessage = (content: React.ReactNode, delay = 600) => {
     setIsTyping(true);
@@ -155,28 +151,38 @@ export default function ChatWindow({
     }, 200);
   };
 
+  // Final message for media flow (with preview button)
   const addPostRecBotMessage = (action: "applied" | "rejected") => {
     const message = (
-        <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded-lg border border-gray-100">
-            <p className="font-semibold text-gray-800">
-                {action === "applied" ? "✅ 推奨事項の適用処理を完了しました。" : "❌ 推奨事項の適用を見送りました。"}
-            </p>
-            <button
-                onClick={() => onShowDetail(score, selectedAccount, action)}
-                className="self-start text-sm font-medium text-blue-600 hover:text-blue-700 transition flex items-center gap-1"
-            >
-                結果詳細を確認 <ChevronRight size={16} />
-            </button>
-            <button
-                onClick={onChatReset}
-                className="self-start text-xs text-gray-500 hover:text-gray-700 transition mt-1"
-            >
-                会話をリセットして最初に戻る
-            </button>
-        </div>
+      <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded-lg border border-gray-100">
+        <p className="font-semibold text-gray-800">
+          {action === "applied"
+            ? "✅ 推奨事項の適用処理を完了しました。最適化スコアが向上しました！"
+            : "❌ 推奨事項の適用を見送りました。現状の設定が維持されます。"}
+        </p>
+        <p className="text-xs text-gray-500">
+          {action === "applied"
+            ? "ROI: +15%（予測） / CPA: -8%（予測）"
+            : "キャンペーン設定に変更はありません。"}
+        </p>
+        <button
+          onClick={() =>
+            onShowPreview({
+              flow: "media",
+              score,
+              accountId: selectedAccount,
+              recProcessed: action,
+              recommendations,
+            })
+          }
+          className="self-start text-xs text-blue-600 hover:text-blue-800 transition mt-1"
+        >
+          プレビューを表示
+        </button>
+      </div>
     );
     addBotMessage(message, 1500);
-  }
+  };
 
   const handleApplyAll = () => {
     addUserMessage("✅ すべての推奨事項を適用する");
@@ -190,10 +196,14 @@ export default function ChatWindow({
     addPostRecBotMessage("rejected");
   };
 
-  const processedAdCards: AdCard[] = useMemo(() => adCards.map((card) => ({
-    ...card,
-    timestamp: new Date(card.date).getTime(),
-  })), []);
+  const processedAdCards: AdCard[] = useMemo(
+    () =>
+      adCards.map((card) => ({
+        ...card,
+        timestamp: new Date(card.date).getTime(),
+      })),
+    []
+  );
 
   const handleAdConfirm = () => {
     handleHistoryUpdate(
@@ -241,13 +251,91 @@ export default function ChatWindow({
     );
   };
 
+  // Final message for variation flow (with preview button)
+  const renderVariationFinal = () => (
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      className="bg-white border border-green-200 rounded-xl p-6 my-4 shadow-sm max-w-xl"
+    >
+      <h4 className="font-bold text-green-800 flex items-center gap-2 mb-3">
+        <Sparkles size={18} /> 具体的改善提案
+      </h4>
+      <ul className="space-y-2 text-gray-700">
+        <li className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">
+            1
+          </span>
+          縦型動画フォーマットへの変更 (Reels最適化)
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">
+            2
+          </span>
+          ライフスタイル要素の追加（商品単体ではなく使用シーン）
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">
+            3
+          </span>
+          UGC（ユーザー証言）の冒頭3秒への組み込み
+        </li>
+      </ul>
+      <button
+        onClick={() =>
+          onShowPreview({
+            flow: "variation",
+            trendReport,
+            comparisonResult,
+            proposals: [
+              "縦型動画フォーマットへの変更 (Reels最適化)",
+              "ライフスタイル要素の追加（商品単体ではなく使用シーン）",
+              "UGC（ユーザー証言）の冒頭3秒への組み込み",
+            ],
+          })
+        }
+        className="mt-4 text-xs text-blue-600 hover:text-blue-800 transition"
+      >
+        プレビューを表示
+      </button>
+    </motion.div>
+  );
+
+  // Final message for meta flow (with preview button)
+  const renderMetaFinal = () => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="mt-6 flex flex-col items-end"
+    >
+       <MetaAAAgentBlock
+        onShowPreview={onShowPreview}
+        metaReportData={metaReport}
+      />
+      {/* <button
+        onClick={() =>
+          onShowPreview({
+            flow: "meta",
+            metaReportData: metaReport,
+          })
+        }
+        className="mt-4 text-xs text-blue-600 hover:text-blue-800 transition"
+      >
+        プレビューを表示
+      </button> */}
+    </motion.div>
+  );
+
   const renderMessage = (msg: ChatMessage, index: number) => (
     <motion.div
       key={index}
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
-      className={`flex gap-3 mb-6 ${msg.type === "user" ? "flex-row-reverse" : "flex-row"}`}
+      className={`flex gap-3 mb-6 ${
+        msg.type === "user" ? "flex-row-reverse" : "flex-row"
+      }`}
     >
       <div
         className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md shrink-0 ${
@@ -282,10 +370,14 @@ export default function ChatWindow({
           <Sparkles size={20} />
         </div>
         <div>
-          <h1 className="font-bold text-gray-800 text-lg">Marketing AI Superagent</h1>
+          <h1 className="font-bold text-gray-800 text-lg">
+            Marketing AI Superagent
+          </h1>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span className="text-xs text-gray-500">Online • Powered by Meta AA</span>
+            <span className="text-xs text-gray-500">
+              Online • Powered by Meta AA
+            </span>
           </div>
         </div>
       </header>
@@ -299,14 +391,27 @@ export default function ChatWindow({
         )}
 
         {isTyping && flow !== "meta" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 mb-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex gap-3 mb-6"
+          >
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shrink-0">
               <Bot size={20} className="text-white" />
             </div>
             <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm flex items-center gap-1">
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></span>
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+              <span
+                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0s" }}
+              ></span>
+              <span
+                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.2s" }}
+              ></span>
+              <span
+                className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.4s" }}
+              ></span>
             </div>
           </motion.div>
         )}
@@ -336,14 +441,14 @@ export default function ChatWindow({
             )}
 
             {step === 2 && !recProcessed && (
-                <div className="max-w-xl mt-4 space-y-4">
-                  <RecommendationsBlock
-                    recommendations={recommendations} 
-                    onApplyAll={handleApplyAll}
-                    onRejectAll={handleRejectAll}
-                    disabled={!!recProcessed}
-                  />
-                </div>
+              <div className="max-w-xl mt-4 space-y-4">
+                <RecommendationsBlock
+                  recommendations={recommendations}
+                  onApplyAll={handleApplyAll}
+                  onRejectAll={handleRejectAll}
+                  disabled={!!recProcessed}
+                />
+              </div>
             )}
           </div>
         )}
@@ -357,7 +462,9 @@ export default function ChatWindow({
                   selected={adSelected}
                   onSelect={(id) =>
                     setAdSelected((sel) =>
-                      sel.includes(id) ? sel.filter((s) => s !== id) : [...sel, id]
+                      sel.includes(id)
+                        ? sel.filter((s) => s !== id)
+                        : [...sel, id]
                     )
                   }
                   onConfirm={handleAdConfirm}
@@ -377,43 +484,18 @@ export default function ChatWindow({
 
             {step >= 3 && showComparison && (
               <div className="max-w-3xl mt-4">
-                <ComparisonBlock result={comparisonResult} onNext={handleComparisonNext} />
+                <ComparisonBlock
+                  result={comparisonResult}
+                  onNext={handleComparisonNext}
+                />
               </div>
             )}
 
-            {step >= 4 && (
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="bg-white border border-green-200 rounded-xl p-6 my-4 shadow-sm max-w-xl"
-              >
-                <h4 className="font-bold text-green-800 flex items-center gap-2 mb-3">
-                  <Sparkles size={18} /> 具体的改善提案
-                </h4>
-                <ul className="space-y-2 text-gray-700">
-                  <li className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">1</span>
-                    縦型動画フォーマットへの変更 (Reels最適化)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">2</span>
-                    ライフスタイル要素の追加（商品単体ではなく使用シーン）
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">3</span>
-                    UGC（ユーザー証言）の冒頭3秒への組み込み
-                  </li>
-                </ul>
-              </motion.div>
-            )}
+            {step >= 4 && renderVariationFinal()}
           </div>
         )}
 
-        {flow === "meta" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-            <MetaAAAgentBlock />
-          </motion.div>
-        )}
+        {flow === "meta" && renderMetaFinal()}
 
         <div ref={messagesEndRef} />
       </div>

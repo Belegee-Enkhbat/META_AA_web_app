@@ -5,6 +5,7 @@ import { BarChart3, TrendingUp, User, MessageSquare, Monitor, CheckCircle, XCirc
 type Props = {
   result: ComparisonResult;
   onNext: () => void;
+  hideButton?: boolean;
 };
 
 // --- Helper Functions for UI ---
@@ -38,7 +39,7 @@ const getRowIcon = (item: string) => {
 };
 
 
-export default function ComparisonBlock({ result, onNext }: Props) {
+export default function ComparisonBlock({ result, onNext, hideButton }: Props) {
   
   // Create an array of rows to map over and apply styling/logic
   const comparisonRows = [
@@ -115,16 +116,20 @@ export default function ComparisonBlock({ result, onNext }: Props) {
           ))}
         </ul>
       </div>
-      
-      {/* Action Button */}
-      <div className="flex justify-end pt-3 border-t border-gray-100">
+      {
+        !hideButton && (
+         <div className="flex justify-end pt-3 border-t border-gray-100">
           <button 
             className="flex items-center gap-2 px-5 py-2 text-sm rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-300 active:scale-95" 
             onClick={onNext}
           >
             具体的な改善提案を作成 <ArrowRight size={16} />
           </button>
-      </div>
+          </div>
+        )
+      }
+      {/* Action Button */}
+     
     </motion.div>
   );
 }

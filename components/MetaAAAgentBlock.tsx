@@ -1,6 +1,6 @@
 "use client";
+import { MetaReportData } from "@/types/chat";
 import { useState, useEffect, useRef } from "react";
-
 // --- Icons ---
 const BotIcon = () => (
   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-sm shrink-0">
@@ -20,7 +20,11 @@ const UserIcon = () => (
   </div>
 );
 
-// --- Type Definitions ---
+type MetaAAAgentBlockProps = {
+  onShowPreview: (data: unknown) => void;
+  metaReportData: MetaReportData; // Replace 'MetaReportData' with the actual type definition
+};
+
 type ChatMsg = {
   type: "bot" | "user";
   content: React.ReactNode;
@@ -31,7 +35,7 @@ type StepType = "user" | "bot" | "botBlock" | "choice" | "auto" | "finalButtons"
 
 type Step = {
   type: StepType;
-  content?: React.ReactNode;
+  content?: React.ReactNode | ((props: MetaAAAgentBlockProps) => React.ReactNode);
   choices?: { label: string; value: string; style?: string }[];
   autoNext?: boolean;
   delay?: number;
@@ -277,16 +281,19 @@ export const steps: Step[] = [
     autoNext: true,
     delay: 2500,
   },
-  {
-    type: "botBlock",
-    content: (
+ {
+  type: "botBlock",
+  content: (props: MetaAAAgentBlockProps) => {
+    return (
       <div className="bg-white border border-gray-200 rounded-lg p-4 my-2 shadow-md">
         <div className="font-bold mb-3 flex items-center gap-2 text-xl text-gray-800">
           <span role="img" aria-label="chart">📊</span>
           TrueLift Analysis Report
         </div>
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mb-4 border border-blue-100">
-          <div className="font-bold text-indigo-700 text-sm uppercase tracking-wide mb-1">Executive Summary</div>
+          <div className="font-bold text-indigo-700 text-sm uppercase tracking-wide mb-1">
+            Executive Summary
+          </div>
           <div className="text-lg">
             Incremental Lift: <span className="text-green-600 font-black text-2xl">+18.5%</span>
           </div>
@@ -296,37 +303,38 @@ export const steps: Step[] = [
         </div>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="bg-gray-50 p-2 rounded">
-             <div className="text-xs text-gray-500">Incremental Sales</div>
-             <div className="font-bold text-gray-900">¥156,890,000</div>
+            <div className="text-xs text-gray-500">Incremental Sales</div>
+            <div className="font-bold text-gray-900">¥156,890,000</div>
           </div>
           <div className="bg-gray-50 p-2 rounded">
-             <div className="text-xs text-gray-500">CPA</div>
-             <div className="font-bold text-gray-900">¥12,450</div>
+            <div className="text-xs text-gray-500">CPA</div>
+            <div className="font-bold text-gray-900">¥12,450</div>
           </div>
         </div>
+        <div className="flex justify-end p-4">
+          <button
+            onClick={() =>
+              props?.onShowPreview?.({ flow: "meta", metaReportData: props.metaReportData })
+            }
+            className="text-xs text-blue-600 hover:text-blue-800 transition"
+          >
+            プレビューを表示
+          </button>
+        </div>
       </div>
-    ),
-    autoNext: true,
-    delay: 1000,
+    );
   },
-  {
-    type: "bot",
-    content: "The above is the analysis report. It can also be exported as a PDF. Do you have any other questions?",
-    autoNext: true,
-    delay: 500,
-  },
-  {
-    type: "finalButtons",
-  },
+  autoNext: true,
+  delay: 1000,
+}
 ];
 
 // --- COMPONENT ---
-export default function MetaAAAgentBlock() {
+export default function MetaAAAgentBlock({ onShowPreview, metaReportData }: MetaAAAgentBlockProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [history, setHistory] = useState<ChatMsg[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom whenever history changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history, currentStep]);
@@ -347,11 +355,21 @@ export default function MetaAAAgentBlock() {
       const timer = setTimeout(() => {
         setHistory((prev) => {
           if (prev.length > currentStep) return prev;
+          // For step 22, pass onShowPreview and metaReportData as props to content
+          if (currentStep === 22 && typeof step.content === "function") {
+            return [
+              ...prev,
+              {
+                type: "bot",
+                content: step.content({ onShowPreview, metaReportData }),
+              },
+            ];
+          }
           return [
             ...prev,
             {
               type: step.type === "user" ? "user" : "bot",
-              content: step.content,
+              content: typeof step.content === "function" ? step.content({ onShowPreview, metaReportData }) : step.content,
             },
           ];
         });
@@ -361,11 +379,11 @@ export default function MetaAAAgentBlock() {
             setCurrentStep((prev) => prev + 1);
           }, step.delay || 600);
         }
-      }, 0); // Immediate state update via timeout to fix React warning
+      }, 0);
 
       return () => clearTimeout(timer);
     }
-  }, [currentStep]);
+  }, [currentStep, onShowPreview, metaReportData]);
 
   const handleChoice = (label: string, style?: string) => {
     setHistory((h) => [
@@ -383,16 +401,10 @@ export default function MetaAAAgentBlock() {
   };
 
   const step = steps[currentStep];
-  
   const showControls = history.length >= currentStep && (step?.type === "choice" || step?.type === "finalButtons");
 
-  // --- RENDER ---
-  // Removed the outer "Card" borders and the internal "Header"
-  // Now it acts as a flexible child component filling its parent.
   return (
     <div className="flex flex-col h-full w-full bg-transparent">
-      
-      {/* Styles for Animation */}
       <style jsx global>{`
         @keyframes slideUpFade {
           from { opacity: 0; transform: translateY(10px); }
@@ -403,17 +415,13 @@ export default function MetaAAAgentBlock() {
         }
       `}</style>
 
-      {/* Chat Area: Fills available space */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
-        
         {history.map((msg, idx) => (
           <div 
             key={idx} 
             className={`flex w-full items-end gap-2 animate-slide-up ${msg.type === "user" ? "justify-end" : "justify-start"}`}
           >
-            {/* Bot Icon */}
             {msg.type === "bot" && <BotIcon />}
-
             <div
               className={`px-5 py-3 text-sm shadow-sm max-w-[85%] transition-all ${
                 msg.type === "bot"
@@ -425,13 +433,10 @@ export default function MetaAAAgentBlock() {
             >
               {msg.content}
             </div>
-
-            {/* User Icon */}
             {msg.type === "user" && <UserIcon />}
           </div>
         ))}
 
-        {/* Typing Indicator (Only shows when waiting for next step) */}
         {step && step.autoNext && history.length === currentStep && (
            <div className="flex w-full items-end gap-2 animate-slide-up justify-start opacity-70">
              <BotIcon />
@@ -446,10 +451,8 @@ export default function MetaAAAgentBlock() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Controls Area (Buttons) */}
       {showControls && (
         <div className="p-4 bg-white/50 backdrop-blur-sm border-t border-gray-200">
-          
           {step.type === "choice" && (
             <div className="flex flex-wrap gap-2 justify-end animate-slide-up">
               {step.choices?.map((c) => (
@@ -463,7 +466,6 @@ export default function MetaAAAgentBlock() {
               ))}
             </div>
           )}
-
           {step.type === "finalButtons" && (
             <div className="flex flex-wrap gap-2 justify-center animate-slide-up">
               <button className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow transition-colors" onClick={() => handleFinal("Export as PDF")}>

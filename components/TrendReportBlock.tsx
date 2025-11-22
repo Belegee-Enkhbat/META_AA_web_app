@@ -6,6 +6,7 @@ type Props = {
   report: TrendReport;
   onCompare: () => void;
   onSkip: () => void;
+  hideButton?: boolean;
 };
 
 // Helper component for metric badges
@@ -16,7 +17,7 @@ const MetricBadge = ({ label, value }: { label: string, value: string | number }
     </div>
 );
 
-export default function TrendReportBlock({ report, onCompare, onSkip }: Props) {
+export default function TrendReportBlock({ report, onCompare, onSkip, hideButton }: Props) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -73,10 +74,12 @@ export default function TrendReportBlock({ report, onCompare, onSkip }: Props) {
       </div>
 
       {/* Footer Actions */}
-      <div className="flex gap-3 mt-6 pt-4 border-t border-gray-100 justify-end">
-        {/* Secondary Button (Skip) */}
-        <button 
-          onClick={onSkip} 
+      {
+        !hideButton && (
+          <div className="flex gap-3 mt-6 pt-4 border-t border-gray-100 justify-end">
+            {/* Secondary Button (Skip) */}
+            <button 
+              onClick={onSkip} 
           className="flex items-center gap-1 px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-all active:scale-95"
         >
           <SkipForward size={16} /> 改善提案へスキップ
@@ -89,6 +92,8 @@ export default function TrendReportBlock({ report, onCompare, onSkip }: Props) {
           比較分析を開始 <ArrowRight size={16} />
         </button>
       </div>
+        )
+      }
     </motion.div>
   );
 }
