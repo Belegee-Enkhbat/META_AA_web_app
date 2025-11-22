@@ -14,6 +14,7 @@ export type DetailDataType = {
   trendReport?: TrendReport;
   comparisonResult?: ComparisonResult;
   metaReportData?: MetaReportData; // New field for Meta AA data
+  proposals?: string[];
 };
 
 

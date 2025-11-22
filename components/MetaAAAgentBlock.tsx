@@ -19,9 +19,10 @@ const UserIcon = () => (
     </svg>
   </div>
 );
+import { DetailDataType } from "./MediaDetailPanel";
 
 type MetaAAAgentBlockProps = {
-  onShowPreview: (data: unknown) => void;
+  onShowPreview: (data: DetailDataType) => void;
   metaReportData: MetaReportData; // Replace 'MetaReportData' with the actual type definition
 };
 

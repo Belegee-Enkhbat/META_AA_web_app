@@ -12,6 +12,7 @@ import ComparisonBlock from "./ComparisonBlock";
 import MetaAAAgentBlock from "./MetaAAAgentBlock";
 import QuickActions from "./QuickActions";
 import { accounts, recommendations, adCards, trendReport, comparisonResult, metaReport } from "@/service/staticData";
+import { DetailDataType } from "./MediaDetailPanel";
 
 export type FlowType = "media" | "variation" | "meta";
 type ChatMessage = {
@@ -21,7 +22,7 @@ type ChatMessage = {
 type RecProcessedType = "applied" | "rejected" | null;
 
 interface ChatWindowProps {
-  onShowPreview: (data: unknown) => void; // Use your DetailDataType if available
+  onShowPreview: (data: DetailDataType) => void; // Use your DetailDataType if available
   onChatReset: () => void;
   isDetailOpen: boolean;
   onFlowChange?: (flow: FlowType | null) => void;
