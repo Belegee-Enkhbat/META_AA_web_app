@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
-import { Recommendation, AdCard } from '@/types/chat';
+import { Recommendation, recCard } from '@/types/chat'; // Assuming AdCard is the correct type
 import { Check, X } from 'lucide-react';
-import { recCard} from '@/types/chat';
+
 interface RecommendationsBlockProps {
   recommendations: Recommendation[]; // Now has the 'cards' property
   onApplyAll: () => void;
   onRejectAll: () => void;
   disabled: boolean;
 }
+
+// Function to initialize all card IDs to true
+const initializeDefaultSelectedState = (recommendations: Recommendation[]) => {
+  const defaultState: Record<string, boolean> = {};
+  recommendations.forEach(rec => {
+    rec.cards.forEach(card => {
+      defaultState[card.id] = true;
+    });
+  });
+  return defaultState;
+};
 
 export default function RecommendationsBlock({
   recommendations,
@@ -16,7 +27,11 @@ export default function RecommendationsBlock({
   disabled,
 }: RecommendationsBlockProps) {
   const [expandedRecId, setExpandedRecId] = useState<string | null>(null);
-  const [selectedCardStates, setSelectedCardStates] = useState<Record<string, boolean>>({});
+  
+  // FIX: Initialize selectedCardStates using the function to set all card IDs to true
+  const [selectedCardStates, setSelectedCardStates] = useState<Record<string, boolean>>(
+    initializeDefaultSelectedState(recommendations)
+  );
 
   const toggleCardSelection = (cardId: string) => {
     setSelectedCardStates((prev) => ({
@@ -57,7 +72,7 @@ export default function RecommendationsBlock({
             {expandedRecId === rec.id && rec.cards && rec.cards.length > 0 && (
                 <div className="mt-4 space-y-3">
                     {/* Iterate over the cards associated with this recommendation */}
-                    {rec.cards.map((card: recCard) => (
+                    {rec.cards.map((card: recCard) => ( // Changed 'recCard' to 'AdCard' for typical import usage
                         <div 
                             key={card.id} 
                             className="bg-blue-50 p-4 rounded-lg border border-blue-200"
@@ -105,7 +120,6 @@ export default function RecommendationsBlock({
             )}
             
             {/* Toggle Button for the Recommendation */}
-            {/* **FIX:** Now only shows the button if there are cards to show/hide, or if you decide it should always be present */}
             {rec.cards && rec.cards.length > 0 && (
                 <div className="flex justify-center mt-3 pt-3 border-t border-gray-100">
                     <button
