@@ -17,6 +17,25 @@ export const recommendations: Recommendation[] = [
       "A/Bテストで20%のクリック率向上を確認"
     ],
     points: 8,
+    // Cards for Font Size Optimization (Based on original image)
+    cards: [
+      {
+        id: "1-1",
+        title: "メインテキスト",
+        subtitle: "フォントサイズ最適化",
+        details: "14px → 20px に変更",
+        rationale: "Meta推奨基準に準拠",
+        points: 4, // Changed points to make total 8 (4+4)
+      },
+      {
+        id: "1-2",
+        title: "サブテキスト",
+        subtitle: "フォントサイズ最適化",
+        details: "12px → 16px に変更",
+        rationale: "可読性向上",
+        points: 4, // Changed points to make total 8 (4+4)
+      },
+    ]
   },
   {
     id: "2",
@@ -29,6 +48,25 @@ export const recommendations: Recommendation[] = [
       "WCAG 2.1アクセシビリティ基準を満たす必要"
     ],
     points: 6,
+    // Cards for CTA Color Change (Plausible data based on description)
+    cards: [
+      {
+        id: "2-1",
+        title: "ボタン色変更",
+        subtitle: "コントラスト比改善",
+        details: "青色 (#007BFF) → オレンジ色 (#FF6B35)",
+        rationale: "WCAG 2.1基準適合",
+        points: 3,
+      },
+      {
+        id: "2-2",
+        title: "アクションテキスト",
+        subtitle: "強調表現追加",
+        details: "「詳細はこちら」→「今すぐ予約」",
+        rationale: "アクション性の向上",
+        points: 3,
+      },
+    ]
   },
   {
     id: "3",
@@ -41,6 +79,25 @@ export const recommendations: Recommendation[] = [
       "Meta Ad Library APIデータで効果実証済み"
     ],
     points: 10,
+    // Cards for Reels Optimization (Plausible data based on description)
+    cards: [
+      {
+        id: "3-1",
+        title: "クリエイティブ縦型化",
+        subtitle: "フォーマット最適化",
+        details: "16:9 (横長) → 9:16 (縦型)",
+        rationale: "リール配置への最適化",
+        points: 7,
+      },
+      {
+        id: "3-2",
+        title: "動画尺調整",
+        subtitle: "視聴完了率向上",
+        details: "動画尺を15秒に短縮",
+        rationale: "推奨動画尺へ調整",
+        points: 3,
+      },
+    ]
   },
   {
     id: "4",
@@ -53,6 +110,25 @@ export const recommendations: Recommendation[] = [
       "手動ターゲティングの制約を超えた配信が可能"
     ],
     points: 8,
+    // Cards for Advantage+ Audience (Plausible data based on description)
+    cards: [
+      {
+        id: "4-1",
+        title: "オーディエンス設定",
+        subtitle: "自動最適化ON",
+        details: "Advantage+ オーディエンスを有効化",
+        rationale: "AIによる最適化実行",
+        points: 6,
+      },
+      {
+        id: "4-2",
+        title: "予算配分",
+        subtitle: "柔軟な配分設定",
+        details: "キャンペーン予算最適化をON",
+        rationale: "パフォーマンス最大化",
+        points: 2,
+      },
+    ]
   },
 ];
 
@@ -101,45 +177,181 @@ export const adCards: AdCard[] = [
 ];
 
 export const trendReport: TrendReport = {
-  summary: "「lipstick」検索結果 (523件)",
-  metrics: [
-    { label: "平均エンゲージメント率", value: "4.2%" },
-    { label: "主要カラートレンド", value: "レッド系 (68%)" },
-    { label: "人気フォーマット", value: "縦型動画 (45%)" }
-  ],
-  insights: [
-    "ライフスタイル統合型の広告が高いエンゲージメントを獲得",
-    "ユーザー生成コンテンツスタイルが効果的",
-    "ビフォー・アフター形式の動画が人気",
-    "季節プロモーション要素の組み込みが増加傾向"
-  ],
-  platforms: [
-    { name: "Instagram", percent: 85 },
-    { name: "Facebook", percent: 70 },
-    { name: "Reels", percent: 60 }
-  ]
-};
+  "report_title": "リップ製品広告トレンド分析レポート",
+  "theme": "日本市場における限定色と実用性の訴求トレンド",
+  "date_generated": "2025-11-22",
+  "summary": {
+    "title": "トレンド概要",
+    "metrics": [
+      {
+        "metric_name": "主要カラートレンド",
+        "value": "限定レッド・ラメ系",
+        "value_en": "Limited Red & Glitter"
+      },
+      {
+        "metric_name": "人気フォーマット",
+        "value": "限定商品オファー",
+        "value_en": "Limited Product Offer"
+      }
+    ]
+  },
+  "insights": {
+    "title": "主要インサイト",
+    "list": [
+      "デュアル・メッセージ戦略: 実用性 (マスクにつきにくい) と季節の魅力 (きらめく赤) の両方を訴求している。",
+      "希少価値マーケティング: すべての訴求を「限定色」とし、購入の緊急性 (FOMO) を高めている。",
+      "フルフェイス提案: リップ単体ではなく、マスカラとのセット提案（Cosmic Red）で、顧客単価向上とトータルルックを提案。",
+      "テクスチャー訴求: 「透けるラメ色」「きらめく」など、テクスチャーの質感を強調する表現を多用。"
+    ]
+  },
+  "recommendations": {
+    "title": "クリエイティブ提案",
+    "list": [
+      "限定感を視覚的に強調: 「LIMITED COLOR」や「限定色」の文字を、単なるテキストではなくデザイン要素として組み込む。",
+      "冬の二面性を表現: 日常の「マスク映え」とホリデーの「華やかさ」を明確に使い分けるバリエーションを用意する。",
+      "リップ+αの提案: 他のアイテムとのセット使用イメージを提示し、トータルコーディネートで購買意欲を刺激する。",
+      "体温を感じる暖色系のライティングとモデル表現を用いる (Cosmic Red)。",
+      "実用的なベネフィット (マスク対応) をキャッチーなアイコンで分かりやすく示す (Glitter My Lips)。"
+    ]
+  },
+  "platform_analysis": {
+    "title": "配信プラットフォーム分析 (市場動向)",
+    "platforms": [
+      {
+        "name": "Instagram",
+        "usage_percentage": 90
+      },
+      {
+        "name": "Reels / TikTok",
+        "usage_percentage": 75
+      },
+      {
+        "name": "Pinterest / Lifest. Media",
+        "usage_percentage": 50
+      }
+    ]
+  },
+  "key_findings": {
+    "title": "主要発見事項",
+    "findings": [
+      {
+        "icon": "🎁",
+        "heading": "シーズンマーケティング",
+        "detail": "限定色は冬の始まりに集中して投入し、認知度と売上を最大化する"
+      },
+      {
+        "icon": "🎨",
+        "heading": "クリエイティブの使い分け",
+        "detail": "「実用性重視の静止画」と「情緒的・モデル重視の動画」の使い分けが効果的"
+      },
+      {
+        "icon": "👥",
+        "heading": "ターゲット層",
+        "detail": "主にF1層 (20-34歳の女性) への限定商品による話題化戦略"
+      }
+    ]
+  }
+}
 
 export const comparisonResult: ComparisonResult = {
-  yourAd: {
-    format: "横型動画 (16:9)",
-    target: "Women 18-65",
-    message: "機能説明型",
-    platform: "Facebook中心"
+  "report_name": "包括的比較分析レポート",
+  "campaign_name": "Shiseido_Maquillage_Hybrid",
+  "comparison_target": "業界トップパフォーマー平均 (OPERA/RIMMEL)",
+  "metrics_benchmark": {
+    "engagement": 4.2,
+    "ctr": 2.1,
+    "cvr": 4.8,
+    "overallScore": 85
   },
-  trend: {
-    format: "縦型動画 (9:16)",
-    target: "Women 25-44",
-    message: "感情訴求型",
-    platform: "Instagram/Reels重視"
+  "metrics_user_ad": {
+    "engagement": 3.5,
+    "ctr": 1.5,
+    "cvr": 4.2,
+    "overallScore": 78,
+    "colorTrend": 85,
+    "textPlacement": 88,
+    "brandExposure": 95,
+    "age18_24": 78,
+    "age25_34": 82,
+    "age35_44": 70
   },
-  recommendations: [
-    "フォーマットを縦型動画（9:16）に変更 → CTR +115%, エンゲージメント +156%",
-    "ターゲット層をWomen 25-44に絞る → CPA -35%, ROAS +45%",
-    "感情訴求型のメッセージに変更 → コンバージョン率 +28%",
-    "Instagram ReelsとStoriesを優先配信 → リーチ +60%, エンゲージメント +80%"
-  ]
-};
+  "recent_ads_status": {
+    "title": "あなたの直近の広告確認 (Maquillage/Shiseido)",
+    "ads": [
+      {
+        "name": "広告A (ライフスタイル動画)",
+        "format": "動画",
+        "strategy": "情緒的・ブランド認知",
+        "target": "Women 25～34歳",
+        "assumed_metric": "CVR",
+        "assumed_value": "0.8%",
+        "status": "低調",
+        "insight_summary": "ライフスタイル訴求に偏り、CVRが非常に低い。",
+        "image_context": "Shiseido_video.jpgのイメージ：クローゼット前のモデル"
+      },
+      {
+        "name": "広告B (製品クローズアップ静止画)",
+        "format": "静止画",
+        "strategy": "質感訴求・美容液効果",
+        "target": "Women 18～25歳",
+        "assumed_metric": "CTR",
+        "assumed_value": "1.9%",
+        "status": "平均",
+        "insight_summary": "クローズアップは効果的だが、CTRが業界ベンチマークに届いていない。",
+        "image_context": "Shiseido1.jpgのイメージ：「ぷるり」ルージュ"
+      }
+    ]
+  },
+  "improvement_recommendations": {
+    "title": "クリエイティブ戦略の推奨事項",
+    "categories": [
+      {
+        "heading": "推奨フォーマット",
+        "recommendation": "動画 + 静止画のハイブリッド戦略の最適化",
+        "details": "動画Aのリーチ力と静止画Bの訴求力を維持しつつ、実用性デモを両方に追加する。"
+      },
+      {
+        "heading": "動画訴求の強化 (広告Aの改善)",
+        "recommendation": "実用性/耐久性デモンストレーションの組み込み",
+        "details": "OPERAトレンドに見られるように、ライフスタイル動画の冒頭や中間で「マスクに色がつきにくい」といった実用的な機能を明確に示すシーンを組み込む。"
+      },
+      {
+        "heading": "静止画の訴求強化 (広告Bの改善)",
+        "recommendation": "限定性と緊急性の明確化",
+        "details": "静止画のクローズアップ写真に「数量限定」「本日終了」といった緊急性の高いオーバーレイを加え、CTRとCVRを直接的に刺激する。"
+      }
+    ]
+  },
+  "implementation_roadmap": {
+    "title": "実装ロードマップ",
+    "timeline": [
+      {
+        "timeframe": "1週間（低工数・高ROI）",
+        "priority": "高",
+        "actions": [
+          "CTAボタンのテキストを「限定色を今すぐチェック」に変更",
+          "広告コピーに「マスクプルーフ」の実用性キーワードを追記"
+        ]
+      },
+      {
+        "timeframe": "2-4週間（中工数・中ROI）",
+        "priority": "中",
+        "actions": [
+          "UGC風の縦型動画クリエイティブを制作・A/Bテスト開始",
+          "ランディングページに「限定色残りわずか」の緊急性バナーを追加"
+        ]
+      },
+      {
+        "timeframe": "1-3ヶ月（高工数・長期戦略）",
+        "priority": "低",
+        "actions": [
+          "35-44歳層に特化した保湿/エイジングケア訴求の長尺動画を制作",
+          "季節に合わせた新たなカラーパレットの訴求準備"
+        ]
+      }
+    ]
+  }
+}
 
 
 export const metaReport: MetaReportData = {

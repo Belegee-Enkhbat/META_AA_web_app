@@ -52,7 +52,7 @@ export const MediaDetailPanel = ({
                   <div className={`rounded-xl p-4 shadow-md ${colorClass} mb-6`}>
                       <h4 className="font-bold text-lg text-gray-900 mb-2">Performance Impact Summary (Action: {actionText})</h4>
                       
-                      <ScoreBlock accountId={accountId} score={score} />
+                      <ScoreBlock accountId={accountId} score={newScore} />
                       <ul className="list-disc pl-5 text-sm text-gray-700 mt-2">
                           <li>Total Recommendations Found: **{totalRecommendations}**</li>
                           <li>Recommendations {actionText}: **{appliedCount}**</li>

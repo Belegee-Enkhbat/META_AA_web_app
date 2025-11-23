@@ -28,7 +28,7 @@ export function VariationDetailPanel({
   );
 
   return (
-    <div className="w-full h-full bg-white p-6 flex flex-col justify-center items-center shadow-2xl rounded-3xl overflow-hidden">
+    <div className="w-full scrollable h-full bg-white p-6 flex flex-col justify-center items-center shadow-2xl rounded-3xl overflow-hidden">
       <div className="flex justify-between w-5/6 items-center pb-4 border-b border-gray-100 mb-4">
         <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <Sparkles size={22} className="text-green-600" />
@@ -69,7 +69,7 @@ export function VariationDetailPanel({
         <TrendReportBlock report={trendReport} onCompare={() => {}} onSkip={() => {}} hideButton={true} />
       )}
       {comparisonResult && (
-        <ComparisonBlock result={comparisonResult} onNext={() => {}} hideButton={true} />
+        <ComparisonBlock data={comparisonResult} onNext={() => {}} hideButton={true} />
       )}
     </div>
   );

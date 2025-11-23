@@ -486,7 +486,7 @@ export default function ChatWindow({
             {step >= 3 && showComparison && (
               <div className="max-w-3xl mt-4">
                 <ComparisonBlock
-                  result={comparisonResult}
+                  data={comparisonResult}
                   onNext={handleComparisonNext}
                 />
               </div>
