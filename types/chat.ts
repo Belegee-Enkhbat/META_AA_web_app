@@ -11,12 +11,81 @@ export type Account = {
   id: string;
   name: string;
 };
-export interface MetaReportData {
-  summary: string;
-  liftPercentage: number;
-  incrementalSales: string; // Formatted currency
-  cpa: string; // Formatted currency
+export type MetaReportData = {
+  report_name: string;
+  campaign_theme: string;
+  metadata: {
+    analysis_period: string;
+    data_source: string;
+    analysis_method: string;
+  };
+  overall_summary: {
+    title: string;
+    metrics: {
+      metric: string;
+      value: string;
+      is_overall: boolean;
+    }[];
+    best_segment: {
+      name: string;
+      lift_value: string;
+      detail_metrics: {
+        metric: string;
+        value: string;
+      }[];
+    };
+    conclusion: string;
+  };
+  detailed_segment_analysis: {
+    title: string;
+    table: {
+      segment: string;
+      exposed_rate: string;
+      control_rate: string;
+      lift_effect: string;
+      significance: string;
+    }[];
+    key_insight: string;
+  };
+  attribution_and_behavior: {
+    title: string;
+    behavior_metrics: {
+      metric: string;
+      lift: string;
+    }[];
+    channel_contribution: {
+      name: string;
+      contribution: string;
+      detail: string;
+    }[];
+    omnichannel_insights: {
+      offline_purchase_rate: string;
+      time_to_purchase: string;
+      search_behavior: string;
+    };
+  };
+  statistical_validation: {
+    title: string;
+    validation_metrics: {
+      label: string;
+      value: string;
+      desc: string;
+    }[];
+  };
+  action_plan: {
+    title: string;
+    recommendations: {
+      priority: "High" | "Medium" | "Low";
+      action: string;
+    }[];
+  };
+};
+
+export interface DetailDataType {
+  flow: "meta" | "media" | "variation" | null;
+  metaReportData: MetaReportData;
 }
+
 // --- 1. DEFINING THE INNER CARD TYPE ---
 export type recCard = {
   id: string;

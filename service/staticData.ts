@@ -355,8 +355,78 @@ export const comparisonResult: ComparisonResult = {
 
 
 export const metaReport: MetaReportData = {
-  summary: "Incremental Lift: Users exposed to Meta ads had a significantly higher purchase rate.",
-  liftPercentage: 18.5,
-  incrementalSales: "¥156,890,000",
-  cpa: "¥12,450",
-};
+  "report_name": "資生堂コスメキャンペーン TrueLift分析レポート",
+  "campaign_theme": "Lipstick Campaign",
+  "metadata": {
+    "analysis_period": "2024年9月1日 - 11月30日 (3ヶ月)",
+    "data_source": "Meta Advanced Analytics × Tobiras (Rakutenデータセット)",
+    "analysis_method": "TrueLift因果推論分析"
+  },
+  "overall_summary": {
+    "title": "全体パフォーマンス概要",
+    "metrics": [
+      { "metric": "総売上リフト", "value": "+21.4%", "is_overall": true },
+      { "metric": "オフライン売上リフト", "value": "+26.8%", "is_overall": true },
+      { "metric": "投資収益率 (ROAS)", "value": "4.7x", "is_overall": true },
+      { "metric": "増分売上", "value": "¥2.1億", "is_overall": true },
+      { "metric": "全体購買率リフト", "value": "+15.2%", "is_overall": true }
+    ],
+    "best_segment": {
+      "name": "Women 30-39",
+      "lift_value": "+29.3%",
+      "detail_metrics": [
+        { "metric": "購買転換率 (接触群)", "value": "12.8%" },
+        { "metric": "平均購入単価リフト", "value": "+22.2%" },
+        { "metric": "リピート購入率リフト", "value": "+40.2%" }
+      ]
+    },
+    "conclusion": "キャンペーンは統計的に有意な売上向上効果を実現。特にWomen 30-39セグメントが貢献し、オフライン店舗での購買促進に強い効果を発揮しました。"
+  },
+  "detailed_segment_analysis": {
+    "title": "セグメント別TrueLift効果分析",
+    "table": [
+      { "segment": "Women 30-39", "exposed_rate": "12.8%", "control_rate": "9.9%", "lift_effect": "+29.3%", "significance": "p < 0.001" },
+      { "segment": "Women 40-49", "exposed_rate": "11.2%", "control_rate": "9.1%", "lift_effect": "+23.1%", "significance": "p < 0.001" },
+      { "segment": "Women 20-29", "exposed_rate": "8.4%", "control_rate": "7.1%", "lift_effect": "+18.3%", "significance": "p < 0.01" },
+      { "segment": "Women 50+", "exposed_rate": "6.8%", "control_rate": "6.2%", "lift_effect": "+9.7%", "significance": "p < 0.05" },
+      { "segment": "Men 35-44", "exposed_rate": "4.1%", "control_rate": "3.5%", "lift_effect": "+15.1%", "significance": "p < 0.05" }
+    ],
+    "key_insight": "Women 30-39セグメントへの予算配分最適化と、平均購入単価（AOV）およびリピート率の改善が重要課題です。"
+  },
+  "attribution_and_behavior": {
+    "title": "購買行動とチャネル貢献度",
+    "behavior_metrics": [
+      { "metric": "購買転換率リフト", "lift": "+30.8%" },
+      { "metric": "平均購入単価リフト", "lift": "+22.2%" },
+      { "metric": "リピート購入率リフト", "lift": "+40.2%" }
+    ],
+    "channel_contribution": [
+      { "name": "Meta Digital Ads", "contribution": "42%", "detail": "購買への直接貢献度が最も高い" },
+      { "name": "TV CM (STADIA)", "contribution": "28%", "detail": "ブランド認知向上に寄与" },
+      { "name": "Store Visit", "contribution": "18%", "detail": "オフライン購買を促進" },
+      { "name": "Website", "contribution": "12%", "detail": "情報収集段階で影響" }
+    ],
+    "omnichannel_insights": {
+      "offline_purchase_rate": "81%",
+      "time_to_purchase": "平均3.2日",
+      "search_behavior": "67%がブランド名で検索後に購買"
+    }
+  },
+  "statistical_validation": {
+    "title": "統計的検証",
+    "validation_metrics": [
+      { "label": "統計的有意性", "value": "p < 0.001", "desc": "99.9%信頼区間" },
+      { "label": "効果量 (Cohen's d)", "value": "0.42", "desc": "中程度の効果" },
+      { "label": "サンプルサイズ", "value": "319K人", "desc": "接触群156K / 対照群163K" }
+    ]
+  },
+  "action_plan": {
+    "title": "💡 アクションプラン",
+    "recommendations": [
+      { "priority": "High", "action": "Women 30-39セグメントへの予算集中（予算の50%）" },
+      { "priority": "High", "action": "オフライン店舗連携の強化と店舗誘導施策の拡大" },
+      { "priority": "Medium", "action": "Rakutenデータを活用したより精密なターゲティングとパーソナライゼーション" },
+      { "priority": "Medium", "action": "オンライン・オフライン統合での顧客体験向上によるオムニチャネル戦略の最適化" }
+    ]
+  }
+}
